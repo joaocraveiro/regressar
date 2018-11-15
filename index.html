@@ -1,8 +1,150 @@
 <html>
 	<head>
+		<script>
+			function calcular(){
+				var bruto = parseFloat(document.getElementById("input-salario-bruto").value);
+				if(!bruto) return;
+
+				var ssTax = bruto * .11;
+
+				var irs = taxaIRS(bruto);
+				var irsPago = bruto * irs;
+
+				var regressarIrsPago = bruto/2*irs;
+				
+				var rnhIrs = Math.min(irs,.2);
+				var rnhIrsPago = bruto*rnhIrs;
+				
+				var liquido = bruto * .89 * (1-irs);
+
+				var regressar = bruto - bruto*.11 - irs*(bruto/2);
+				var rnh = bruto - bruto*.11 - bruto*.2;
+
+				document.getElementsByName("seg-social").forEach(function(elem){
+					elem.innerHTML = "-" + ssTax.toFixed(2) + "€";
+				});
+				
+				document.getElementById("irs").innerHTML = "(" + (irs*100).toFixed(0) + "%)  -" + irsPago.toFixed(2) + "€";
+				document.getElementById("regressar-irs").innerHTML = "(" + (irs*100).toFixed(0) + "% de metade)  -" + regressarIrsPago.toFixed(2) + "€";
+				document.getElementById("rnh-irs").innerHTML = "(" + (rnhIrs*100).toFixed(0) + "%)  -" + rnhIrsPago.toFixed(2) + "€";
+
+				document.getElementById("salario-liquido-anual").innerHTML = liquido.toFixed(2) + "€";
+				document.getElementById("salario-liquido-mensal").innerHTML = (liquido/12).toFixed(2) + "€";
+
+				document.getElementById("regressar-anual").innerHTML = regressar.toFixed(2) + "€";
+				document.getElementById("regressar-mensal").innerHTML = (regressar/12).toFixed(2) + "€";
+				document.getElementById("regressar-ganho-mensal").innerHTML = (regressar/12 - liquido/12).toFixed(2) + "€";
+				document.getElementById("regressar-ganho-anual").innerHTML = (regressar-liquido).toFixed(2) + "€";
+				document.getElementById("regressar-ganho-5anos").innerHTML = ((regressar-liquido)*5).toFixed(2) + "€";
+
+				document.getElementById("rnh-anual").innerHTML = rnh.toFixed(2) + "€";
+				document.getElementById("rnh-mensal").innerHTML = (rnh/12).toFixed(2) + "€";
+				document.getElementById("rnh-ganho-mensal").innerHTML = (rnh/12 - liquido/12).toFixed(2) + "€";
+				document.getElementById("rnh-ganho-anual").innerHTML = (rnh-liquido).toFixed(2) + "€";
+				document.getElementById("rnh-ganho-5anos").innerHTML = ((rnh-liquido)*5).toFixed(2) + "€";
+				document.getElementById("rnh-ganho-10anos").innerHTML = ((rnh-liquido)*10).toFixed(2) + "€";
+
+				document.getElementById("resultados").style.display = "block";
+			}
+
+			function taxaIRS(salario){
+				if(salario <= 0) return 0;
+				if(salario <= 7091) return 0.145;
+				if(salario <= 10700) return 0.23;
+				if(salario <= 20261) return 0.285;
+				if(salario <= 25000) return 0.35;
+				if(salario <= 36856) return 0.37;
+				if(salario <= 80640) return 0.45;
+				if(salario > 80640) return 0.48;
+			}
+		</script>
 	</head>
-	<body>
-		<h2>Calculadora Regressar
-		<h4>Percebe quais as vantagens do programa regressar e do estatuto de residente não habitual.</h4>
+	<body style="margin: 0; padding: 10px;">
+		<h2>Calculadora Regressar VS Residente Não Habitual
+		<h4>Percebe quais as vantagens financeiras ao regressar a Portugal com o Programa Regressar ou com o Estatuto de Residente Não Habitual. Sendo estatutos mutuamente exclusivos, quem se encontre em posição de aderir a qualquer um dos dois deve ter em consideração quanto vai ganhar para poder tomar a melhor decisão do ponto de vista financeiro.</h4>
+
+		<h3>Programa Regressar</h3>
+		Requisitos: Não ter sido residente em Portugal nos 3 anos anteriores e regressar até ao final de 2020.<br>
+		Beneficio: IRS aplica-se apenas a 50% dos rendimentos. Válido por 5 anos.
+
+		<h3>Residente Não-Habitual</h3>
+		Requisitos: Não ter sido residente em Portugal nos 5 anos anteriores. Apenas aplicável a actividades de elevado valor acrescentado com carácter cientifico, artistico ou tecnico:  Arquitetos, engenheiros e similares; artistas plásticos, atores e músicos; auditores; médicos e dentistas, professores e psicólogos; profissões liberais, técnicos e assimilados; quadros superiores; investidores, administradores e gestores, quando integrados em empresas que tenham sido abrangidas pelo regime contratual previsto no Código Fiscal do Investimento.<br>
+		Beneficio: IRS máximo de 20%. Válido por 10 anos.
+
+		<!-- <br><br>TL;DR: Para quem pode escolher entre um dos dois estatuos o Programa Regressar interessa compensa a quem 
+		ganhe menos de 4500 brutos por mês. 
+		esteja no 4ºescalao 20261 ou superior
+		-->
+
+		<br><br>
+		<hr>
+		<p>Salario bruto anual a receber em Portugal (€):
+			<input id="input-salario-bruto" type="text" autofocus>
+			<button onclick="calcular()">Calcular</button>
+		</p>
+
+
+		<div id="resultados" style="display:none">
+
+			<table>
+			<tr>
+				<td></td>
+				<td style="width: 200px; text-align: center;"><b>Sem beneficios</b></td>
+				<td style="width: 200px; text-align: center;"><b>Programa Regressar</b></td>
+				<td style="width: 200px; text-align: center;"><b>Residente Não Habitual</b></td>
+			</tr>
+			<tr>
+				<td><b>Segurança social (11%)</b></td>
+				<td name="seg-social" style="text-align: right; color: red;"></td>
+				<td name="seg-social" style="text-align: right; color: red;"></td>
+				<td name="seg-social" style="text-align: right; color: red;"></td>
+			</tr>
+			<tr>
+				<td><b>IRS</b></td>
+				<td id="irs" style="text-align: right; color: red;"></td>
+				<td id="regressar-irs" style="text-align: right; color: red;"></td>
+				<td id="rnh-irs" style="text-align: right; color: red;"></td>
+			</tr>
+			<tr>
+				<td><b>Salario liquido anual</b></td>
+				<td id="salario-liquido-anual" style="text-align: right"></td>
+				<td id="regressar-anual" style="text-align: right"></td>
+				<td id="rnh-anual" style="text-align: right"></td>
+			</tr>
+			<tr>
+				<td><b>Salario liquido mensal</b></td>
+				<td id="salario-liquido-mensal" style="text-align: right"></td>
+				<td id="regressar-mensal" style="text-align: right"></td>
+				<td id="rnh-mensal" style="text-align: right"></td>
+			</tr>
+			<tr>
+				<td><b>Beneficio mensal</b></td>
+				<td style="text-align: right">-</td>
+				<td id="regressar-ganho-mensal" style="text-align: right"></td>
+				<td id="rnh-ganho-mensal" style="text-align: right"></td>
+			</tr>
+			<tr>
+				<td><b>Beneficio anual</b></td>
+				<td style="text-align: right">-</td>
+				<td id="regressar-ganho-anual" style="text-align: right"></td>
+				<td id="rnh-ganho-anual" style="text-align: right"></td>
+			</tr>
+			<tr>
+				<td><b>Beneficio 5 anos</b></td>
+				<td style="text-align: right">-</td>
+				<td id="regressar-ganho-5anos" style="text-align: right"></td>
+				<td id="rnh-ganho-5anos" style="text-align: right"></td>
+			</tr>
+			<tr>
+				<td><b>Beneficio 10 anos</b></td>
+				<td style="text-align: right">-</td>
+				<td style="text-align: right">-</td>
+				<td id="rnh-ganho-10anos" style="text-align: right"></td>
+			</tr>
+		</table>
+
+		<br><br><br>
+
+		<p style="width: 100%; font-size: 11px; position: fixed; bottom: 0; text-align: center;">Aviso legal: A informação apresentada neste website é meramente informativa e não será assumida qualquer responsabilidade pela sua utilização.
 	</body>
 </html>
