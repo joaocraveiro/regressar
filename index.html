@@ -48,14 +48,32 @@
 			}
 
 			function taxaIRS(salario){
-				if(salario <= 0) return 0;
-				if(salario <= 7091) return 0.145;
-				if(salario <= 10700) return 0.23;
-				if(salario <= 20261) return 0.285;
-				if(salario <= 25000) return 0.35;
-				if(salario <= 36856) return 0.37;
-				if(salario <= 80640) return 0.45;
-				if(salario > 80640) return 0.48;
+				var tabelaEscaloes = [
+					{valor: 0, taxa:0},
+					{valor: 7091, taxa:0.145},
+					{valor: 10700, taxa:0.23},
+					{valor: 20261, taxa:0.285},
+					{valor: 25000, taxa:0.35},
+					{valor: 36856, taxa:0.37},
+					{valor: 80640, taxa:0.45},
+					{valor: -1, taxa:0.48},
+				]
+				var allowance = Math.max(salario*.11, 4104);
+				if(salario < allowance) return 0;
+				else{
+					var salarioTaxavel = salario - allowance;
+					var escalao = 1;
+					var impostos = 0;
+					while(salarioTaxavel > tabelaEscaloes[escalao].valor){
+						var decrementoSalario = tabelaEscaloes[escalao].valor - tabelaEscaloes[escalao-1].valor;
+						impostos += decrementoSalario * tabelaEscaloes[escalao].taxa;
+						salarioTaxavel -= decrementoSalario;
+						escalao++;
+					}
+					impostos += salarioTaxavel * tabelaEscaloes[escalao].taxa;
+					console.log(impostos,(impostos / salario * 100));
+					return impostos / salario * 100;
+				}
 			}
 		</script>
 	</head>
